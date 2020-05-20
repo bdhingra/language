@@ -151,7 +151,7 @@ def postprocess_candidate_chains(kb, topic_ent, answers, candidate_chains,
     if intermediate_entities[-1] == answers:
       return chain, intermediate_entities
 
-  return None, None
+  return None, []
 
 
 def _link_entity_list(entity_list, entity2id):
@@ -225,11 +225,13 @@ def main(_):
   with open(os.path.join(FLAGS.output_dir, 'entities.txt'), 'w') as f:
     f.write('\n'.join(entities))
   for num_hop in range(1, 4):
+    odir = os.path.join(FLAGS.output_dir, "%d-hop" % num_hop)
+    if not os.path.exists(odir):
+      os.makedirs(odir)
     for split in ['train', 'dev', 'test']:
       data_in_filename = os.path.join(
           FLAGS.metaqa_dir, '%d-hop/vanilla/qa_%s.txt' % (num_hop, split))
-      data_out_filename = os.path.join(FLAGS.output_dir,
-                                       '%d-hop/%s.json' % (num_hop, split))
+      data_out_filename = os.path.join(odir, '%s.json' % split)
       preprocess_metaqa(kb, entity2id, data_in_filename, data_out_filename,
                         num_hop)
 
